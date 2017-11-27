@@ -256,10 +256,12 @@ netns_set_ip()
 	# there is no other host with the same address, the address is
 	# considered to be "tentative" (attempts to bind() to the address fail
 	# with EADDRNOTAVAIL) which may cause problems for tests using ipv6.
-	$NS_EXEC $NS_HANDLE0 $NS_TYPE sysctl -w net.ipv6.conf.all.accept_dad=0
-	$NS_EXEC $NS_HANDLE0 $NS_TYPE sysctl -w net.ipv6.conf.veth0.accept_dad=0
-	$NS_EXEC $NS_HANDLE1 $NS_TYPE sysctl -w net.ipv6.conf.all.accept_dad=0
-	$NS_EXEC $NS_HANDLE1 $NS_TYPE sysctl -w net.ipv6.conf.veth1.accept_dad=0
+	echo 0 | $NS_EXEC $NS_HANDLE0 $NS_TYPE \
+		tee /proc/sys/net/ipv6/conf/veth0/accept_dad \
+		/proc/sys/net/ipv6/conf/veth0/accept_ra >/dev/null
+	echo 0 | $NS_EXEC $NS_HANDLE1 $NS_TYPE \
+		tee /proc/sys/net/ipv6/conf/veth1/accept_dad \
+		/proc/sys/net/ipv6/conf/veth1/accept_ra >/dev/null
 
 	case $USE_IFCONFIG in
 	1)
